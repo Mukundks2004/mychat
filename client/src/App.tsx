@@ -11,6 +11,9 @@ type MessageDto = {
     contents: string;
 }
 
+const websocketUrl = process.env.REACT_APP_WEBSOCKET_URL!;
+// const websocketUrl = 'http://192.168.0.69:5000'
+
 function App() {
   const [messages, setMessages] = useState<MessageDto[]>([]);
 
@@ -32,15 +35,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log('effect running')
-    const socket = new WebSocket('ws://localhost:5000');
+    const socket = new WebSocket(websocketUrl);
 
     socket.onopen = () => {
       console.log('Websocket connected!');
     }
 
     socket.onmessage = (event) => {
-      console.log("got message")
       try {
         const data = JSON.parse(event.data);
 
@@ -58,7 +59,7 @@ function App() {
     }
 
     socket.onclose = () => {
-      console.log("ws disconnected");
+      console.log("Websocket disconnected");
     }
 
     return () => {

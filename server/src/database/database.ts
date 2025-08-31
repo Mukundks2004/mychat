@@ -34,10 +34,10 @@ export type AccountDto = {
 
 const db = new sqlite3.Database('./src/database/mychat.db', ((err: Error | null) => {
     if (err) {
-        console.error('Could not connect to database', err);
+        console.error('Could not connect to database!', err);
     }
     else {
-        console.log('Connected to SQLite database');
+        console.log('Connected to SQLite database!');
     }
 }));
 
@@ -61,6 +61,8 @@ db.serialize(() => {
             FOREIGN KEY (account_uuid) REFERENCES account(uuid)
         );`
     );
+
+    db.run(`INSERT OR IGNORE INTO account (uuid, color, name, address, created) VALUES ('8599c544-90e7-4971-9330-e22687299f54', '#000000', 'guest', '127.0.0.1', strftime('%s', 'now'))`);
 })
 
 export const addAccount = async (uuid: UUID, color: string, name: string, address: string, created: Date) => {

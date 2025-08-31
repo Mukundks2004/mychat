@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import express from 'express'
-import { addAccount, addMessage, getAccountByAddress, getAllMessagesWithAccountOrderByDate, type AccountDto, type UUID } from './database/database.ts'
-import { WebSocketServer } from 'ws';
+import { addAccount, addMessage, getAccountByAddress, getAllMessagesWithAccountOrderByDate, type AccountDto, type UUID } from './database/database.js'
+import { WebSocket, WebSocketServer } from 'ws';
 import http from 'http';
+import cors from 'cors';
 
 type MessageDto = {
     uuid: UUID;
@@ -14,19 +15,25 @@ type MessageDto = {
 
 const app = express();
 app.use(express.json());
+app.use(cors({
+  origin: 'https://mkstech.dev',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+
 app.set('trust proxy', true);
 
 const PORT = 5000;
 
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server, path: '/socket' });
 
 const broadcastMessage = (data: MessageDto) => {
-    console.log('broadcasting')
     const message = JSON.stringify(data);
     wss.clients.forEach(client => {
         if (client.readyState === client.OPEN) {
-            console.log("client!", message);
             client.send(message);
         }
     })
@@ -47,19 +54,17 @@ app.post('/api/submit', async (req, res) => {
         }
 
         const ip = req.ip;
-        console.log("ip", ip, "len", ip?.length);
 
         var accountDto: AccountDto | null = {
             uuid: "8599c544-90e7-4971-9330-e22687299f54",
             name: "Guest",
             color: "#000000",
-
         }
+        
         if (ip) {
             accountDto = await getAccountByAddress(ip);
-            console.log(accountDto)
             if (!accountDto) {
-                console.log("creating new account!");
+                console.log("Creating new account for ip " + ip + "!");
                 accountDto = {
                     uuid: uuidv4(),
                     name: getRandomName(),
@@ -101,23 +106,24 @@ app.get('/api/messages', async (req, res) => {
     }
 });
 
+
+wss.on('connection', (ws: WebSocket) => {
+    console.log("Client connected via websocket!");
+});
+
 server.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
 
-wss.on('connection', (ws: WebSocket) => {
-    console.log("Client connected via websocket!");
-    ws.send(JSON.stringify({ type: 'info', message: 'Websocket connected' }));
-});
-
 function getRandomColor(): string {
     const colors = [
-        '#ff0000',
-        '#00ff00',
-        '#0000ff',
-        '#00ffff',
-        '#ff00ff',
-        '#ffff00',
+        '#990000',
+        '#009900',
+        '#000099',
+        '#009999',
+        '#990099',
+        '#9900ff',
+        '#999900',
         '#999999',
     ]
 

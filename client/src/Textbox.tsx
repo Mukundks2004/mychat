@@ -11,9 +11,7 @@ export function Textbox() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setSubmittedText(text);
-        console.log("submit")
         try {
-            console.log("submit client!");
             const response = await fetch('/api/submit', {
                 method: 'POST',
                 headers: {
@@ -26,14 +24,11 @@ export function Textbox() {
                 throw new Error('API call failed!');
             }
 
-            const result = await response.json();
-            console.log(result);
+            await response.json();
         }
         catch (error) {
             console.error('Submission error:', error);
         }
-
-        console.log(text)
 
         setText('');
     }

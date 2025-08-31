@@ -1,1 +1,13 @@
 INSERT INTO account (uuid, color, name, address, created) VALUES ('8599c544-90e7-4971-9330-e22687299f54', '#000000', 'guest', '127.0.0.1', strftime('%s', 'now'));
+
+docker cp e23:/app/src/database/mychat.db .
+
+location / {
+        allow 192.168.0.69;
+        deny all;
+    }
+
+    # Disable HTTP/1.0 fallback for better WebSocket handling
+    tcp_nopush on;
+    tcp_nodelay on;
+
