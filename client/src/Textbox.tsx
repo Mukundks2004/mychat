@@ -13,6 +13,7 @@ export function Textbox() {
         setSubmittedText(text);
         console.log("submit")
         try {
+            console.log("submit client!");
             const response = await fetch('/api/submit', {
                 method: 'POST',
                 headers: {
