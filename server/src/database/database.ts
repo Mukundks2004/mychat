@@ -1,7 +1,7 @@
 import type { UUID } from 'crypto';
 import sqlite3 from 'sqlite3'
 
-const db = new sqlite3.Database('./mychat.db', ((err: Error | null) => {
+const db = new sqlite3.Database('./src/database/mychat.db', ((err: Error | null) => {
     if (err) {
         console.error('Could not connect to database', err);
     }
@@ -14,6 +14,7 @@ db.serialize(() => {
     db.run(`
         CREATE TABLE IF NOT EXISTS account (
             uuid TEXT PRIMARY KEY,
+            color TEXT NOT NULL,
             name TEXT NOT NULL,
             address TEXT NOT NULL,
             created DATETIME NOT NULL
@@ -55,7 +56,19 @@ export const getAllAccounts = () => {
     });
 }
 
-const getMessagesByAccount = (account_uuid: UUID) => {
+export const getAllMessagesOrderByDate = () => {
+    return new Promise((resolve, reject) => {
+        db.all('SELECT * FROM message ORDER BY time_sent ASC;', [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+export const getMessagesByAccount = (account_uuid: UUID) => {
     return new Promise((resolve, reject) => {
         db.all('SELECT * FROM message WHERE account_uuid = ?', [account_uuid], (err, rows) => {
             if (err) {

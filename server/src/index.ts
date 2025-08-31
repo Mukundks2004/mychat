@@ -7,10 +7,16 @@ const PORT = 5000;
 
 app.use(express.json());
 
-app.get('/api/hello', async (req, res) => {
-    addAccount(randomUUID(), "lol", "127.0.0.1", new Date())
-    const messages = await getAllAccounts();
-    res.json({message: JSON.stringify(messages) });
+app.get('/api/test', async (req, res) => {
+    addAccount(randomUUID(), "a", "b", new Date())
+    const messages: any = await getAllAccounts();
+    const text: string = messages.map((m: { name: string; uuid: string; }) => m.name + ": " + m.uuid).join();
+    res.json({message: text });
+})
+
+app.post('/api/submit', async (req, res) => {
+    const data = req.body;
+
 })
 
 app.listen(PORT, () => {
